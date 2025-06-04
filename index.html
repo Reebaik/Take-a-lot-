@@ -3,54 +3,291 @@
 <head>
   <meta charset="UTF-8">
   <title>Take a Lot - Random Number (1 to 60)</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
+    :root {
+      --primary-color: #1abc9c;
+      --primary-dark: #16a085;
+      --danger-color: #e74c3c;
+      --text-color: #2c3e50;
+      --text-light: #7f8c8d;
+      --bg-gradient: linear-gradient(135deg, #f6f9fc, #ddeeff);
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.1);
+      --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.15);
+      --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.18);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
     body {
-      font-family: 'Segoe UI', sans-serif;
-      background: linear-gradient(135deg, #f6f9fc, #ddeeff);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg-gradient);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem;
+      color: var(--text-color);
+    }
+
+    .container {
+      max-width: 800px;
+      width: 100%;
+      text-align: center;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 2rem;
+      border-radius: 24px;
+      box-shadow: var(--shadow-lg);
+      backdrop-filter: blur(10px);
+    }
+
+    h1 {
+      font-size: 2.5rem;
+      color: var(--text-color);
+      margin-bottom: 1.5rem;
+      font-weight: 700;
+    }
+
+    #number {
+      font-size: 6rem;
+      font-weight: 800;
+      color: var(--primary-color);
+      margin: 2rem 0;
+      transition: all 0.3s ease;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+      min-height: 120px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 20px;
+      box-shadow: var(--shadow-sm);
+      padding: 1rem;
+    }
+
+    #number.empty {
+      color: var(--text-light);
+      font-size: 4rem;
+      background: rgba(240, 244, 250, 0.8);
+    }
+
+    .button-group {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin: 1.5rem 0;
+    }
+
+    button {
+      padding: 1rem 2rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: white;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: var(--shadow-sm);
+      min-width: 160px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    button.primary {
+      background-color: var(--primary-color);
+    }
+
+    button.primary:hover {
+      background-color: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    button.danger {
+      background-color: var(--danger-color);
+    }
+
+    button.danger:hover {
+      background-color: #c0392b;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    button.secondary {
+      background-color: #95a5a6;
+    }
+
+    button.secondary:hover {
+      background-color: #7f8c8d;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    button:active {
+      transform: translateY(0);
+      box-shadow: var(--shadow-sm);
+    }
+
+    #generated-today {
+      margin-top: 2rem;
+      padding: 1.5rem;
+      background: rgba(255, 255, 255, 0.8);
+      border-radius: 16px;
+      box-shadow: var(--shadow-sm);
+      min-height: 100px;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      gap: 1rem;
+    }
+
+    #generated-today.empty {
+      background: rgba(240, 244, 250, 0.8);
+    }
+
+    #generated-today .empty-state {
+      color: var(--text-light);
+      font-size: 1.2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    #generated-today .empty-state i {
+      font-size: 2rem;
+      opacity: 0.7;
+    }
+
+    #generated-today .numbers {
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+
+    .clear-button {
+      margin-top: 1rem;
+      opacity: 0;
+      transform: translateY(-10px);
+      transition: all 0.3s ease;
+    }
+
+    .clear-button.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Modal Styles */
+    #absentees-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
       height: 100vh;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 1rem;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 24px;
+      width: 100%;
+      max-width: 800px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-lg);
+      position: relative;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .modal-header h2 {
+      font-size: 1.8rem;
+      color: var(--text-color);
       margin: 0;
     }
 
-    h1 {
-      font-size: 3em;
-      color: #2c3e50;
-      margin-bottom: 20px;
+    .close-button {
+      background: none;
+      border: none;
+      font-size: 2rem;
+      color: var(--text-light);
+      cursor: pointer;
+      padding: 0.5rem;
+      line-height: 1;
+      min-width: auto;
+      box-shadow: none;
     }
 
-    #number {
-      font-size: 5em;
-      font-weight: bold;
-      color: #2980b9;
-      margin: 40px 0;
-      transition: transform 0.3s ease;
+    .close-button:hover {
+      color: var(--text-color);
+      transform: none;
+      box-shadow: none;
     }
 
-button {
-  padding: 16px 36px;
-  font-size: 1.3em;
-  background-color: #1abc9c;
-  color: white;
-  border: none;
-  border-radius: 14px;
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.3s ease;
-}
+    #absentees-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+      padding: 1rem;
+      background: rgba(240, 244, 250, 0.5);
+      border-radius: 16px;
+    }
 
-button:hover {
-  background-color: #16a085;
-  box-shadow: 0 8px 20px rgba(22, 160, 133, 0.6);
-}
+    .absentee-box {
+      aspect-ratio: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: white;
+      border: 2px solid #e0e6ed;
+      border-radius: 12px;
+      font-size: 1.2rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: none;
+      box-shadow: var(--shadow-sm);
+    }
 
-button:active {
-  transform: scale(0.96);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-}
+    .absentee-box:hover {
+      transform: translateY(-2px);
+      border-color: var(--primary-color);
+      box-shadow: var(--shadow-md);
+    }
 
+    .absentee-box.selected {
+      background: var(--primary-color);
+      border-color: var(--primary-dark);
+      color: white;
+      transform: scale(1.05);
+    }
+
+    .modal-footer {
+      display: flex;
+      gap: 1rem;
+      justify-content: flex-end;
+      margin-top: 1.5rem;
+    }
 
     canvas {
       position: fixed;
@@ -61,13 +298,85 @@ button:active {
       height: 100%;
       z-index: 999;
     }
+
+    @media (max-width: 600px) {
+      .container {
+        padding: 1.5rem;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      #number {
+        font-size: 4rem;
+      }
+
+      button {
+        padding: 0.8rem 1.5rem;
+        font-size: 1rem;
+        min-width: 140px;
+      }
+
+      #absentees-grid {
+        grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+        gap: 0.8rem;
+      }
+    }
   </style>
 </head>
 <body>
+  <div class="container">
+    <h1>🎯 Take a Lot</h1>
+    <div id="number" class="empty">Click to Generate</div>
+    
+    <div class="button-group">
+      <button class="primary" onclick="generateNumber()">
+        <i class="fas fa-random"></i>
+        Take Lot
+      </button>
+      <button class="primary" id="absentees-btn" onclick="openAbsenteesModal()">
+        <i class="fas fa-user-slash"></i>
+        Select Absentees
+      </button>
+    </div>
 
-  <h1>🎯 Take a Lot</h1>
-  <div id="number">?</div>
-  <button onclick="generateNumber()">Take Lot</button>
+    <div id="generated-today" class="empty">
+      <div class="empty-state">
+        <i class="fas fa-history"></i>
+        <span>No numbers generated today</span>
+      </div>
+    </div>
+    <button class="danger clear-button" onclick="clearTodayNumbers()">
+      <i class="fas fa-trash-alt"></i>
+      Clear Today's Numbers
+    </button>
+  </div>
+
+  <!-- Absentees Modal -->
+  <div id="absentees-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2><i class="fas fa-user-slash"></i> Select Absentees</h2>
+        <button class="close-button" onclick="closeAbsenteesModal()">&times;</button>
+      </div>
+      <div id="absentees-grid"></div>
+      <div class="modal-footer">
+        <button class="primary" onclick="saveAbsentees()">
+          <i class="fas fa-save"></i>
+          Save
+        </button>
+        <button class="danger" onclick="clearAbsentees()">
+          <i class="fas fa-trash-alt"></i>
+          Clear All
+        </button>
+        <button class="secondary" onclick="closeAbsenteesModal()">
+          <i class="fas fa-times"></i>
+          Cancel
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- Confetti canvas -->
   <canvas id="confetti-canvas"></canvas>
@@ -75,8 +384,107 @@ button:active {
   <script>
     const excludedNumbers = [4, 25, 31, 39];
 
+    // --- Absentees logic ---
+    function getAbsenteesKey() {
+      const d = new Date();
+      return `absentees_${d.getFullYear()}_${d.getMonth()+1}_${d.getDate()}`;
+    }
+
+    function getAbsentees() {
+      return JSON.parse(localStorage.getItem(getAbsenteesKey()) || '[]');
+    }
+
+    function setAbsentees(list) {
+      localStorage.setItem(getAbsenteesKey(), JSON.stringify(list));
+    }
+
+    function clearAbsentees() {
+      if (confirm('Are you sure you want to clear all absentees?')) {
+        setAbsentees([]);
+        const boxes = document.querySelectorAll('#absentees-grid .absentee-box');
+        boxes.forEach(box => box.classList.remove('selected'));
+      }
+    }
+
+    // --- Generated today logic ---
+    function getTodayKey() {
+      const d = new Date();
+      return `generated_${d.getFullYear()}_${d.getMonth()+1}_${d.getDate()}`;
+    }
+    function getGeneratedToday() {
+      return JSON.parse(localStorage.getItem(getTodayKey()) || '[]');
+    }
+    function addGeneratedToday(num) {
+      const arr = getGeneratedToday();
+      arr.push(num);
+      localStorage.setItem(getTodayKey(), JSON.stringify(arr));
+    }
+
+    function clearTodayNumbers() {
+      if (confirm('Are you sure you want to clear all numbers generated today?')) {
+        localStorage.removeItem(getTodayKey());
+        document.getElementById('number').innerText = '?';
+        updateGeneratedTodayUI();
+      }
+    }
+
+    function updateGeneratedTodayUI() {
+      const arr = getGeneratedToday();
+      const container = document.getElementById('generated-today');
+      const clearButton = document.querySelector('.clear-button');
+      
+      if (arr.length === 0) {
+        container.className = 'empty';
+        container.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-history"></i>
+            <span>No numbers generated today</span>
+          </div>
+        `;
+        clearButton.classList.remove('visible');
+      } else {
+        container.className = '';
+        container.innerHTML = `
+          <div class="numbers">Numbers generated today: ${arr.join(', ')}</div>
+        `;
+        clearButton.classList.add('visible');
+      }
+    }
+
+    // --- Absentees Modal ---
+    function openAbsenteesModal() {
+      const modal = document.getElementById('absentees-modal');
+      const grid = document.getElementById('absentees-grid');
+      grid.innerHTML = '';
+      const absentees = getAbsentees();
+      for (let i = 1; i <= 60; i++) {
+        if (excludedNumbers.includes(i)) continue;
+        const box = document.createElement('div');
+        box.innerText = i;
+        box.className = 'absentee-box' + (absentees.includes(i) ? ' selected' : '');
+        box.onclick = function() {
+          box.classList.toggle('selected');
+        };
+        grid.appendChild(box);
+      }
+      modal.style.display = 'flex';
+    }
+    function closeAbsenteesModal() {
+      document.getElementById('absentees-modal').style.display = 'none';
+    }
+    function saveAbsentees() {
+      const boxes = document.querySelectorAll('#absentees-grid .absentee-box');
+      const selected = [];
+      boxes.forEach(box => {
+        if (box.classList.contains('selected')) selected.push(Number(box.innerText));
+      });
+      setAbsentees(selected);
+      closeAbsenteesModal();
+    }
+
     function animateNumber(num) {
       const numberEl = document.getElementById('number');
+      numberEl.classList.remove('empty');
       let current = 0;
       const step = Math.ceil(num / 20);
       const interval = setInterval(() => {
@@ -94,11 +502,26 @@ button:active {
     }
 
     function generateNumber() {
-      let num;
-      do {
-        num = Math.floor(Math.random() * 60) + 1;
-      } while (excludedNumbers.includes(num));
+      const absentees = getAbsentees();
+      const generated = getGeneratedToday();
+      let available = [];
+      for (let i = 1; i <= 60; i++) {
+        if (
+          !excludedNumbers.includes(i) &&
+          !absentees.includes(i) &&
+          !generated.includes(i)
+        ) {
+          available.push(i);
+        }
+      }
+      if (available.length === 0) {
+        alert('No available numbers left to generate today!');
+        return;
+      }
+      const num = available[Math.floor(Math.random() * available.length)];
       animateNumber(num);
+      addGeneratedToday(num);
+      updateGeneratedTodayUI();
     }
 
     // Simple confetti effect
@@ -149,6 +572,11 @@ button:active {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
       }, 3000);
     }
+
+    // Initialize UI
+    document.addEventListener('DOMContentLoaded', () => {
+      updateGeneratedTodayUI();
+    });
   </script>
 
 </body>
